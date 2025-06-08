@@ -37,6 +37,7 @@ st.title("Police Check post log 🚓")
 
 st.write("This form is used to record and monitor vehicle stops conducted at police check posts. Officers or authorized personnel are requested to log accurate information about each stop, including the date, time, location, driver details, and nature of the stop.")
 
+# Create a form for police log entry
 st.title("police_log_form 📝")
 with st.form("police_log_form 📝"):
     stop_date = st.date_input("Stop Date 📅")
@@ -53,9 +54,8 @@ with st.form("police_log_form 📝"):
 
     submitted=st.form_submit_button("🤖 Predict Stop Outcome & Violation")
 
+# Function to predict violation and outcome
 def predict_violation_and_outcome(df):
-    # Replace with real model logic
-    # Dummy logic
     if df["driver_age"] < 18:
         violation = "reckless driving"
         outcome = "citation"
@@ -67,7 +67,6 @@ def predict_violation_and_outcome(df):
         outcome = "warning"
 
     return violation, outcome
-
 
 if submitted:
     input_data = {
@@ -95,7 +94,7 @@ if submitted:
     )
 
 
-
+#Advanced Insights Section
 st.title("📊 Advanced Insights")
 st.subheader("Select query to get insights")
 
@@ -341,5 +340,7 @@ if st.button("Run complex_Query 🧠"):
     st.write("### Query Results:")
     st.dataframe(df)
 
-st.dataframe(df)
+st.subheader("📊 Logged Vehicle Stop Data")
+data = pd.read_csv('D:\\MDTE21\\Police\\traffic_stops - traffic_stops_with_vehicle_number.csv')
+st.dataframe(data) 
     
