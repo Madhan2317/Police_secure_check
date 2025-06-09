@@ -1,7 +1,6 @@
-import pandas as pd 
 import streamlit as st
+import pandas as pd
 import psycopg2
-from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 
 #Dataset Path
 df = pd.read_csv('D:\\MDTE21\\Police\\traffic_stops - traffic_stops_with_vehicle_number.csv')
@@ -16,88 +15,88 @@ df = df.dropna()
 #save the cleaned dataset
 df.to_csv('traffic_stops_cleaned.csv', index=False)
 
-#database connection
-connection = psycopg2.connect(
+
+# --- PAGE CONFIGURATION ---
+st.markdown("""
+    <style>
+    .stApp {
+        background-image: url("https://t3.ftcdn.net/jpg/06/49/11/00/360_F_649110054_ZnMGBRFXklYBXpRmDR2uiMWrb9okjjJI.jpg");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+    }
+    .main {
+        background-color: rgba(25, 25, 55, 0.85); /* reduced transparency from 0.8 to 0 */
+        padding: 2rem;
+        border-radius: 10px;
+    }
+     .block-container {
+        background-color: rgba(50, 25, 55, 0.85);
+        padding: 2rem;
+        border-radius: 12px;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+# --- SIDEBAR ---
+with st.sidebar:
+    st.image("https://img.icons8.com/emoji/96/police-car-light.png", width=80)
+    st.markdown("## 🚨 Police Stop Dashboard")
+    st.markdown("Monitor, log, and analyze vehicle stops for data-driven policing.")
+    st.markdown("---")
+    st.markdown("👤 Developed by: *MADHAN KUMAR*")
+
+# --- HEADER ---
+st.markdown("<h1 style='text-align: center;'>🚓 Police Check Post Logging System</h1>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; font-size:18px;'>An interactive dashboard for monitoring and predicting outcomes of vehicle stops.</p>", unsafe_allow_html=True)
+
+# --- DATABASE CONNECTION ---
+conn = psycopg2.connect(
     host="localhost",
+    database="Policestop",
     user="postgres",
     password="Madhan2317",
-    port = 5432,
-    database = "Policestop" # Ensure this database exists or create it before running the code
+    port="5432"
 )
 
-connection.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)  # This is to set the isolation level to autocommit mode
+# --- FORM FOR LOGGING DATA ---
+with st.form("police_log_form"):
+        st.markdown("#### Fill in Stop Details")
+        stop_date = st.date_input("📅 Stop Date")
+        stop_time = st.time_input("🕒 Stop Time")
+        country_name = st.text_input("🌐 Country Name")
+        driver_gender = st.selectbox("🚻 Driver Gender", ["Male 👨", "Female 👩", "Other ⚧️"])
+        driver_age = st.number_input("🎂 Driver Age", min_value=16, max_value=100)
+        driver_race = st.text_input("🧑🏾‍🤝‍🧑🏻 Driver Race")
+        search_conducted = st.radio("🔍 Was a Search Conducted?", ["Yes", "No"])
+        search_type = st.text_input("🔎 Search Type")
+        drugs_related = st.radio("💊 Drug Related Stop?", ["Yes", "No"])
+        stop_duration = st.selectbox("⏱ Stop Duration", ["0-15 Min", "16-30 Min", "30+ Min"])
+        vehicle_number = st.text_input("🚗 Vehicle Number")
 
-transulator = connection.cursor()
+        submitted = st.form_submit_button("🚀 Predict Outcome & Log")
+        if submitted:
+            predicted_outcome = "Arrested" if driver_age > 20 and drugs_related == "Yes" else "Not Arrested" 
+            predicted_violation = "Speeding" if search_conducted == "Yes" else "No Violation"
 
+            st.success("🚔 Stop Logged Successfully!")
+            st.info(f"🧠 Prediction: **{predicted_outcome}** for **{predicted_violation}**")
 
-# Streamlit UI
-st.set_page_config(layout="wide")
-
-st.title("Police Check post log 🚓")
-
-st.write("This form is used to record and monitor vehicle stops conducted at police check posts. Officers or authorized personnel are requested to log accurate information about each stop, including the date, time, location, driver details, and nature of the stop.")
-
-# Create a form for police log entry
-st.title("police_log_form 📝")
-with st.form("police_log_form 📝"):
-    stop_date = st.date_input("Stop Date 📅")
-    stop_time = st.time_input("Stop Time 🕒")
-    country_name = st.text_input("Country Name 🌐")
-    driver_gender = st.selectbox("Driver Gender", ["Male 👨", "Female 👩", "Other 	🧑‍🦱 or ⚧️"])
-    driver_age = st.number_input("Driver Age", min_value=16, max_value=100, step=1)
-    driver_race = st.text_input("🧑🏾‍🤝‍🧑🏻Driver Race")
-    search_conducted = st.selectbox("🔍 Was a Search Conducted? 🕵️‍♂️", [0, 1])
-    search_type = st.text_input("🚗Search Type🔍")
-    drugs_related = st.selectbox("Was it Drug Related? 💊", [0, 1])
-    stop_duration = st.selectbox("Stop Duration ⏱", ["0-15 Min", "16-30 Min", "30+ Min"])
-    vehicle_number = st.text_input("🚗Vehicle Number🔢")
-
-    submitted=st.form_submit_button("🤖 Predict Stop Outcome & Violation")
-
-# Function to predict violation and outcome
-def predict_violation_and_outcome(df):
-    if df["driver_age"] < 18:
-        violation = "reckless driving"
-        outcome = "citation"
-    elif df["was_drug_related"]:
-        violation = "drug_related offense"
-        outcome = "arrest"
-    else:
-        violation = "speeding"
-        outcome = "warning"
-
-    return violation, outcome
-
+# --- PREDICTION SUMMARY ---
 if submitted:
-    input_data = {
-        "driver_age": driver_age,
-        "was_search_conducted": search_conducted,
-        "was_drug_related": drugs_related,
-        "stop_time": stop_time,
-        "stop_date": stop_date,
-        "gender": driver_gender,
-        "vehicle_number": vehicle_number,
-        "stop_duration": stop_duration,
-    }
-
-    violation, outcome = predict_violation_and_outcome(input_data)
-
     # Display results
     st.subheader("🚔 Prediction Summary")
-    st.markdown(f"- **Predicted Violation**: {violation}")
-    st.markdown(f"- **Predicted Stop Outcome**: {outcome}")
+    st.markdown(f"- **Predicted Violation**: {predicted_violation}")
+    st.markdown(f"- **Predicted Stop Outcome**: {predicted_outcome}")
     st.markdown(
-        f"📄 A {driver_age}-year-old {driver_gender.lower()} driver in {country_name} was stopped at {input_data['stop_time']} on {input_data['stop_date']}. "
+        f"📄 A {driver_age}-year-old {driver_gender.lower()} driver in {country_name} was stopped at {'stop_time'} on {'stop_date'}. "
         f"{'A search was conducted' if search_conducted else 'No search was conducted'}, and the stop "
         f"{'was' if drugs_related else 'was not'} drug-related. "
         f"Stop duration: **{stop_duration}**. Vehicle Number: **{vehicle_number}**."
     )
 
-
-#Advanced Insights Section
-st.title("📊 Advanced Insights")
-st.subheader("Select query to get insights")
-
+# --- SQL QUERY MAPPINGS ---
 query_mapping = {
     "1.What are the top 10 vehicle_Number involved in drug-related stops?":
     """SELECT vehicle_number, COUNT(*) AS stop_count
@@ -225,22 +224,7 @@ query_mapping = {
        ORDER BY total_search_conducted DESC
        LIMIT 1;"""
 }
-
-
-# Dropdown options
-options = list(query_mapping.keys())
-selected_query = st.selectbox("🧮 Medium level query:", options)
-
-# Run button
-if st.button("Run Query🧮"):
-    sql = query_mapping[selected_query]
-    df = pd.read_sql_query(sql, connection)
-    st.write("### Query Results:")
-    st.dataframe(df)
-
-
-#complex queries
-st.subheader("Complex Queries 🧠")
+# --- COMPLEX QUERIES ---
 complex_query_mapping = {
     "1.Yearly Breakdown of Stops and Arrests by Country?":
     """
@@ -329,18 +313,26 @@ complex_query_mapping = {
     """
 }
 
-# Dropdown options
-options = list(complex_query_mapping.keys())
-selected_query = st.selectbox("Complex level query 🧠:", options)
+# --- QUERY TABS ---
+tab1, tab2 = st.tabs(["📊 Medium-Level Queries", "🧠 Complex-Level Queries"])
 
-# Run button
-if st.button("Run complex_Query 🧠"):
-    sql = complex_query_mapping[selected_query]
-    df = pd.read_sql_query(sql, connection)
-    st.write("### Query Results:")
+with tab1:
+    selected_query = st.selectbox("Select a Medium Query", list(query_mapping.keys()))
+    if st.button("Run Query 🔎"):
+        sql = query_mapping[selected_query]
+        df = pd.read_sql_query(sql, conn)
+        st.dataframe(df, use_container_width=True)
+
+with tab2:
+    selected_complex = st.selectbox("Select a Complex Query", list(complex_query_mapping.keys()))
+    if st.button("Run Complex Query 🧠"):
+        sql = complex_query_mapping[selected_complex]
+        df = pd.read_sql_query(sql, conn)
+        st.dataframe(df, use_container_width=True)
+
+# --- SHOW ALL DATA ---
+with st.expander("📋 View Raw Stop Data"):
+    df_all = pd.read_sql_query("SELECT * FROM police_stops", conn)
     st.dataframe(df)
-
-st.subheader("📊 Logged Vehicle Stop Data")
-data = pd.read_csv('D:\\MDTE21\\Police\\traffic_stops - traffic_stops_with_vehicle_number.csv')
-st.dataframe(data) 
-    
+# --- FOOTER ---
+st.markdown("---")  
