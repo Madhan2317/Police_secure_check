@@ -336,3 +336,4 @@ with st.expander("📋 View Raw Stop Data"):
     st.dataframe(df)
 # --- FOOTER ---
 st.markdown("---")  
+st.markdown("<p style='text-align: center;'>🚓 *Stay Safe, Drive Smart!* 🚓</p>", unsafe_allow_html=True)
