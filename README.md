@@ -8,10 +8,10 @@ A centralized and efficient system to log, track, and analyze vehicle stops at p
 
 **Police_secure_check** aims to modernize traditional check post logging systems by providing:
 
-- 📊 **Real-time dashboards**
-- 🗃️ **SQL-based secure data storage**
-- 🔍 **Instant analytics and alerts**
-- ✅ **User-friendly form for logging entries**
+ 📊 **Real-time dashboards**
+ 🗃️ **SQL-based secure data storage**
+ 🔍 **Instant analytics and alerts**
+ ✅ **User-friendly form for logging entries**
 
 This project is especially useful for law enforcement, traffic monitoring teams, and smart city integrations.
 
@@ -19,25 +19,27 @@ This project is especially useful for law enforcement, traffic monitoring teams,
 
 ## 🚀 Features
 
-- Dynamic Streamlit UI for logging driver and vehicle stop data.
-- Gender-wise, age-wise, and search-type visualizations.
-- Violation and stop outcome predictions based on input data.
-- Clean form with dropdowns, date/time pickers, and validations.
-- Data preview and filtering options.
-
+📋 Log Form: Collect stop details like driver age, gender, race, stop time, search status, etc.
+🧠 Prediction Engine: Predict the likelihood of arrest and type of violation using basic logic.
+📊 Medium-Level Queries: Run predefined SQL queries to extract insights from police stop data.
+🔍 Advanced Query Engine: Execute complex analytical queries to uncover deep patterns.
+🌍 Dashboard UI: Clean, responsive, and visually appealing dashboard with a thematic background.
+🧾 PostgreSQL Integration: Real-time querying from a structured PostgreSQL database.
 ---
 
 ## 🛠️ Tech Stack
 
 - **Frontend & Dashboard:** Streamlit
 - **Backend:** Python
-- **Database:** PostgreSQL / SQLite
+- **Database:** PostgreSQL
 - **Data Handling:** Pandas
 
 ---
 
 ## 📸 Screenshots
-![image](https://github.com/user-attachments/assets/de1453d3-0fee-41aa-b4b6-c027bbd7ca79)
-![image](https://github.com/user-attachments/assets/9f276f35-10c0-4db0-9db8-14d8eefb0332)
+![image](![image](https://github.com/user-attachments/assets/9d98f6ea-1378-42f5-b83f-6bf72c5d7a6c)
+)
+![image](![image](https://github.com/user-attachments/assets/d5773ff2-6f27-4cac-9481-71d0c6fc6b2a)
+)
 
 
