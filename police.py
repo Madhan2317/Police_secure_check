@@ -77,24 +77,10 @@ with st.form("police_log_form"):
         submitted = st.form_submit_button("🚀 Predict Outcome & Log")
         if submitted:
             predicted_outcome = "Arrested" if driver_age > 20 and drugs_related == "Yes" else "Not Arrested" 
-            predicted_violation = "Speeding" if search_conducted == "Yes" else "No Violation"
+            predicted_violation = "Speeding or Drugs related" if search_conducted == "Yes" else "No Violation"
 
             st.success("🚔 Stop Logged Successfully!")
             st.info(f"🧠 Prediction: **{predicted_outcome}** for **{predicted_violation}**")
-
-# --- PREDICTION SUMMARY ---
-if submitted:
-    # Display results
-    st.subheader("🚔 Prediction Summary")
-    st.markdown(f"- **Predicted Violation**: {predicted_violation}")
-    st.markdown(f"- **Predicted Stop Outcome**: {predicted_outcome}")
-    st.markdown(
-        f"📄 A {driver_age}-year-old {driver_gender.lower()} driver in {country_name} was stopped at {'stop_time'} on {'stop_date'}. "
-        f"{'A search was conducted' if search_conducted else 'No search was conducted'}, and the stop "
-        f"{'was' if drugs_related else 'was not'} drug-related. "
-        f"Stop duration: **{stop_duration}**. Vehicle Number: **{vehicle_number}**."
-    )
-
 # --- SQL QUERY MAPPINGS ---
 query_mapping = {
     "1.What are the top 10 vehicle_Number involved in drug-related stops?":
