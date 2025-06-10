@@ -1,6 +1,8 @@
 import streamlit as st
 import pandas as pd
 import psycopg2
+import matplotlib.pyplot as plt
+import plotly.express as px
 
 #Dataset Path
 df = pd.read_csv('D:\\MDTE21\\Police\\traffic_stops - traffic_stops_with_vehicle_number.csv')
@@ -15,6 +17,10 @@ df = df.dropna()
 #save the cleaned dataset
 df.to_csv('traffic_stops_cleaned.csv', index=False)
 
+# --- STREAMLIT PAGE CONFIGURATION ---
+st.set_page_config(
+    layout="wide"
+)
 
 # --- PAGE CONFIGURATION ---
 st.markdown("""
@@ -27,25 +33,18 @@ st.markdown("""
         background-attachment: fixed;
     }
     .main {
-        background-color: rgba(25, 25, 55, 0.85); /* reduced transparency from 0.8 to 0 */
+        background-color: reduced transparency from 0.8 to 0 
         padding: 2rem;
         border-radius: 10px;
     }
      .block-container {
-        background-color: rgba(50, 25, 55, 0.85);
+        background-color: rgba(30,25,40, 0.75);
         padding: 2rem;
         border-radius: 12px;
+        layout: wide;
     }
     </style>
 """, unsafe_allow_html=True)
-
-# --- SIDEBAR ---
-with st.sidebar:
-    st.image("https://img.icons8.com/emoji/96/police-car-light.png", width=80)
-    st.markdown("## 🚨 Police Stop Dashboard")
-    st.markdown("Monitor, log, and analyze vehicle stops for data-driven policing.")
-    st.markdown("---")
-    st.markdown("👤 Developed by: *MADHAN KUMAR*")
 
 # --- HEADER ---
 st.markdown("<h1 style='text-align: center;'>🚓 Police Check Post Logging System</h1>", unsafe_allow_html=True)
@@ -313,6 +312,39 @@ complex_query_mapping = {
     """
 }
 
+# data visualization
+
+col1,col2 = st.columns(2)
+
+col1.subheader("📊 Violation Distribution")
+with col1:
+    violation_counts = df['violation'].value_counts().reset_index()
+    violation_counts.columns = ['Violation Category', 'Count']
+    fig = px.bar(violation_counts, x='Violation Category', y='Count', title="Stop Violations Distribution")
+    st.plotly_chart(fig)
+    st.metric("🚦 Total Stops", int(violation_counts['Count'].sum()))
+
+col2.subheader("Gender Distribution of Drivers")
+with col2:
+    gender_counts = df['driver_gender'].value_counts()
+    fig = px.pie(values=gender_counts.values, names=gender_counts.index, title="Driver Gender Distribution")
+    st.plotly_chart(fig)
+    st.metric("🚻 Total Drivers", int(gender_counts.sum()))
+
+col1.subheader("Top 4 countries with highest stops")
+with col1:
+    country_counts = df['country_name'].value_counts().head(4)
+    fig = px.bar(country_counts, x=country_counts.index, y=country_counts.values, title="Top 4 Countries with Highest Stops")
+    st.plotly_chart(fig)
+    st.metric("🌍 Total Stops", int(country_counts.sum()))
+
+col2.subheader("Drug-Related Arrests")
+with col2:
+    drug_related_counts = df['drugs_related_stop'].value_counts()
+    fig = px.pie(values=drug_related_counts.values, names=drug_related_counts.index, title="Drug-Related Arrests")
+    st.plotly_chart(fig)
+    st.metric("🚨 Drug-Related Arrests", int(drug_related_counts.sum()))
+
 # --- QUERY TABS ---
 tab1, tab2 = st.tabs(["📊 Medium-Level Queries", "🧠 Complex-Level Queries"])
 
@@ -321,19 +353,17 @@ with tab1:
     if st.button("Run Query 🔎"):
         sql = query_mapping[selected_query]
         df = pd.read_sql_query(sql, conn)
-        st.dataframe(df, use_container_width=True)
+        st.dataframe(df)
 
 with tab2:
     selected_complex = st.selectbox("Select a Complex Query", list(complex_query_mapping.keys()))
     if st.button("Run Complex Query 🧠"):
         sql = complex_query_mapping[selected_complex]
         df = pd.read_sql_query(sql, conn)
-        st.dataframe(df, use_container_width=True)
+        st.dataframe(df)
 
 # --- SHOW ALL DATA ---
 with st.expander("📋 View Raw Stop Data"):
-    df_all = pd.read_sql_query("SELECT * FROM police_stops", conn)
     st.dataframe(df)
 # --- FOOTER ---
 st.markdown("---")  
-st.markdown("<p style='text-align: center;'>🚓 *Stay Safe, Drive Smart!* 🚓</p>", unsafe_allow_html=True)
